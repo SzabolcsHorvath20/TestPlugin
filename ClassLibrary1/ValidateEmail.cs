@@ -48,13 +48,13 @@ namespace Plugins
             var httpRequest = (HttpWebRequest)WebRequest.Create(url);
             httpRequest.Method = "POST";
             httpRequest.Accept = "application/json";
-            httpRequest.Headers["Authorization"] = "Bearer xfvogRv8OGCrDbKa5Z3wXdMwjyPVmKUY";
+            httpRequest.Headers["Authorization"] = "Bearer ";
             httpRequest.ContentType = "application/json";
 
             var data = @"{
                           ""email"": """ + email + @""",
                           ""valid"": " + valid.ToString().ToLower() + @",
-                          ""token"": ""xfvogRv8OGCrDbKa5Z3wXdMwjyPVmKUY""
+                          ""token"": """"
                         }";
             using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
             {
