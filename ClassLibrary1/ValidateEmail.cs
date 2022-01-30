@@ -8,21 +8,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using Newtonsoft.Json;
 
 namespace Plugins
 {
-
+    
 
     public class ValidateEmail : IPlugin
     {
-        public class ValidatedEmail
-        {
-            public string Email { get; set; }
-            public bool Valid { get; set; }
-            public string Token { get; set; }
-        }
-
         public void Execute(IServiceProvider serviceProvider)
         {
             IPluginExecutionContext context = (IPluginExecutionContext)
@@ -36,38 +28,40 @@ namespace Plugins
                 {
                     entity["cr1f8_valid"] = true;
                     PostRequest(email, true);
-
+                }
+                else
+                {
+                    entity["cr1f8_valid"] = false;
+                    PostRequest(email, false);
                 }
             }
             else
             {
                 entity["cr1f8_valid"] = false;
-                PostRequest((string)entity["emailaddress1"], false);
+                PostRequest("empty@empty.empty", false);
             }
         }
 
-        public void PostRequest(string email, bool valid)
+        public HttpStatusCode PostRequest(string email, bool valid)
         {
             var url = "https://crane-hire.azurewebsites.net/api/email_validation?code=Bwp9Qq81v7Q2u2hgFaRqzKuh394wlBoSRFU32Z5UO5v2yd/tVNvhZg==";
             var httpRequest = (HttpWebRequest)WebRequest.Create(url);
             httpRequest.Method = "POST";
             httpRequest.Accept = "application/json";
-            httpRequest.Headers["Authorization"] = "Bearer ";
+            httpRequest.Headers["Authorization"] = "Bearer xfvogRv8OGCrDbKa5Z3wXdMwjyPVmKUY";
             httpRequest.ContentType = "application/json";
 
-            var data = new ValidatedEmail()
-            {
-                Email = email,
-                Valid = valid,
-                Token = ""
-
-            };
-            string json = JsonConvert.SerializeObject(data);
+            var data = @"{
+                          ""email"": """ + email + @""",
+                          ""valid"": " + valid.ToString().ToLower() + @",
+                          ""token"": ""xfvogRv8OGCrDbKa5Z3wXdMwjyPVmKUY""
+                        }";
             using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
             {
-                streamWriter.Write(json);
+                streamWriter.WriteLine(data);
             }
             var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+            return httpResponse.StatusCode;
         }
     }
 }
